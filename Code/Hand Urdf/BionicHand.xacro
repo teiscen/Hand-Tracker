@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="bionic_hand">
+
+<!-- Color Definition -->
+	<material name="color_white">	<color rgba="1 1 1 1"/></material>
+	<material name="color_yellow"><color rgba="1 1 0 1"/></material>
+
+<!-- Dirn/Locn Macro -->
+	<xacro:macro name="axis_000" params="">	<axis xyz="0 0 0"/></xacro:macro>
+	<xacro:macro name="axis_y" params="">	 	<axis xyz="0 1 0"/></xacro:macro>
+	<xacro:macro name="rpy_000" params="">	<origin rpy="0 0 0"/></xacro:macro>
+	
+<!-- Shape macros -->
+	<xacro:macro name="shape_box_lower_segment" params="">
+  	<geometry><box size="0.05 0.02 0.01"/></geometry>
+	</xacro:macro>
+
+<!-- Macro for a finger link -->
+<xacro:macro name="finger_link" params="name color_macro">
+  <link name="${name}">
+    <visual>
+      <xacro:shape_box_lower_segment/>
+			<!-- <box size="1 1 1"/> -->
+      <material name="${color_macro}"/>
+    </visual>
+  </link>
+</xacro:macro>
+
+<!-- Macro for a finger joint -->
+  <xacro:macro name="finger_joint" params="name parent child xyz rpy axis lower upper effort velocity">
+    <joint name="${name}" type="revolute">
+      <parent link="${parent}"/>
+      <child link="${child}"/>
+      <origin xyz="${xyz}" rpy="${rpy}"/>
+      <axis xyz="${axis}"/>
+      <limit effort="${effort}" velocity="${velocity}" lower="${lower}" upper="${upper}"/>
+    </joint>
+  </xacro:macro>
+
+<!-- Base link -->
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <box size="0.1 0.1 0.02"/>
+      </geometry>
+      <material>
+        <color rgba="1 0.5 0 1"/>
+      </material>
+    </visual>
+  </link>
+
+<!-- Define fingers using macros -->
+	<xacro:finger_link name="index_lower" color_macro="color_white"/>
+	<xacro:finger_link name="finger_2_link" color_macro="color_yellow"/>
+	<xacro:finger_link name="finger_2_link" color_macro="color_yellow"/>
+	<xacro:finger_link name="finger_2_link" color_macro="color_yellow"/>
+
+  <xacro:finger_joint name="finger_1_joint" parent="base_link" child="finger_1_link" 
+                      xyz="0 0 0.02" rpy="0 0 0" axis="0 1 0" 
+                      lower="0" upper="1.57" effort="10" velocity="1"/>
+  <xacro:finger_joint name="finger_2_joint" parent="base_link" child="finger_2_link" 
+                      xyz="0.05 0 0.02" rpy="0 0 0" axis="0 1 0" 
+                      lower="0" upper="1.57" effort="10" velocity="1"/>
+
+</robot>
