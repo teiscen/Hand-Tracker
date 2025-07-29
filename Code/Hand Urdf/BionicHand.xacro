@@ -11,29 +11,63 @@
 	<xacro:macro name="rpy_000" params="">	<origin rpy="0 0 0"/></xacro:macro>
 	
 <!-- Shape macros -->
-	<xacro:macro name="shape_box_lower_segment" params="">
-  	<geometry><box size="0.05 0.02 0.01"/></geometry>
+	<xacro:macro name="shape_box_lower_segment" params=""> 
+  	<geometry><box size="0.06 0.03 0.02"/></geometry>
 	</xacro:macro>
 
-<!-- Macro for a finger link -->
-<xacro:macro name="finger_link" params="name color_macro">
-  <link name="${name}">
-    <visual>
-      <xacro:shape_box_lower_segment/>
-			<!-- <box size="1 1 1"/> -->
-      <material name="${color_macro}"/>
-    </visual>
-  </link>
-</xacro:macro>
+  <!-- Redefine Shape top here -->
+  <xacro:macro name="shape_box_upper_segment" params=""> 
+  	<geometry><box size="0.06 0.03 0.02"/></geometry>
+	</xacro:macro>
+
+  <!-- Create Shape thumb lower here -->
+  <xacro:macro name="shape_box_thumb_lower_segment" params=""> 
+  	<geometry><box size="0.06 0.03 0.02"/></geometry>
+	</xacro:macro>
+
+<!-- Link Macros -->
+  <xacro:macro name="lower_link" params="name color_macro"> 
+    <link name="${name}">
+      <visual>
+        <origin xyz="0.025 0 0" rpy="0 0 0"/>
+        <xacro:shape_box_lower_segment/> 
+        <material name="${color_macro}"/>
+      </visual>
+    </link>
+  </xacro:macro>
+
+  <xacro:macro name="upper_link" params="name color_macro"> 
+    <link name="${name}">
+      <visual>
+        <origin xyz="0.025 0 0" rpy="0 0 0"/>
+        <xacro:shape_box_upper_segment/> 
+        <material name="${color_macro}"/>
+      </visual>
+    </link>
+  </xacro:macro>
+
+  <xacro:macro name="upper_link" params="name color_macro"> 
+    <link name="${name}">
+      <visual>
+        <origin xyz="0.025 0 0" rpy="0 0 0"/>
+        <xacro:shape_box_thumb_lower_segment/> 
+        <material name="${color_macro}"/>
+      </visual>
+    </link>
+  </xacro:macro>
 
 <!-- Macro for a finger joint -->
-  <xacro:macro name="finger_joint" params="name parent child xyz rpy axis lower upper effort velocity">
+  <xacro:macro name="joint_limits" params="">
+    <limit lower="0" upper="1.57" effort="10" velocity="1"/>
+  </xacro:macro>
+
+  <xacro:macro name="finger_joint" params="name parent child xyz rpy axis">
     <joint name="${name}" type="revolute">
       <parent link="${parent}"/>
       <child link="${child}"/>
       <origin xyz="${xyz}" rpy="${rpy}"/>
       <axis xyz="${axis}"/>
-      <limit effort="${effort}" velocity="${velocity}" lower="${lower}" upper="${upper}"/>
+      <xacro:joint_limits/>
     </joint>
   </xacro:macro>
 
@@ -41,7 +75,7 @@
   <link name="base_link">
     <visual>
       <geometry>
-        <box size="0.1 0.1 0.02"/>
+        <box size="0.18 0.125 0.02"/> 
       </geometry>
       <material>
         <color rgba="1 0.5 0 1"/>
@@ -50,16 +84,70 @@
   </link>
 
 <!-- Define fingers using macros -->
-	<xacro:finger_link name="index_lower" color_macro="color_white"/>
-	<xacro:finger_link name="finger_2_link" color_macro="color_yellow"/>
-	<xacro:finger_link name="finger_2_link" color_macro="color_yellow"/>
-	<xacro:finger_link name="finger_2_link" color_macro="color_yellow"/>
 
-  <xacro:finger_joint name="finger_1_joint" parent="base_link" child="finger_1_link" 
-                      xyz="0 0 0.02" rpy="0 0 0" axis="0 1 0" 
-                      lower="0" upper="1.57" effort="10" velocity="1"/>
-  <xacro:finger_joint name="finger_2_joint" parent="base_link" child="finger_2_link" 
-                      xyz="0.05 0 0.02" rpy="0 0 0" axis="0 1 0" 
-                      lower="0" upper="1.57" effort="10" velocity="1"/>
+  <!-- Mostly you will be messig with the xyz and positioning -->
+
+  <!-- xyz is where the joint rotates so make sure its at the end -->
+  <!-- look up or ask ai, idk figure out what axis and rpy does  -->
+	<xacro:lower_link name="index_lower" color_macro="color_white"/>
+	<xacro:upper_link name="index_upper" color_macro="color_yellow"/>
+  <xacro:finger_joint 
+    name="index_base_lower_joint" 
+    parent="base_link" 
+    child="index_lower" 
+    xyz="0.095 0.048 0" rpy="0 0 0" axis="0 1 0"
+  />
+  <xacro:finger_joint 
+    name="index_upper_lower_joint" 
+    parent="index_lower" 
+    child="index_upper" 
+    xyz="0.06 0 0" rpy="0 0 0" axis="0 1 0"
+  />
+
+  <!-- Copy the same format as above for each finger tweaking whatever is needed -->
+  <xacro:lower_link name="middle_lower" color_macro="color_white"/>
+	<xacro:upper_link name="middle_upper" color_macro="color_yellow"/>
+  <xacro:finger_joint 
+    name="index_base_lower_joint" 
+    parent="base_link" 
+    child="middle_lower" 
+    xyz="0.095 0.016 0" rpy="0 0 0" axis="0 1 0"
+  />
+  <xacro:finger_joint 
+    name="index_upper_lower_joint" 
+    parent="middle_lower" 
+    child="middle_upper" 
+    xyz="0.06 0 0" rpy="0 0 0" axis="0 1 0"
+  />
+
+  <xacro:lower_link name="ring_lower" color_macro="color_white"/>
+	<xacro:upper_link name="ring_upper" color_macro="color_yellow"/>
+  <xacro:finger_joint 
+    name="index_base_lower_joint" 
+    parent="base_link" 
+    child="ring_lower" 
+    xyz="0.095 -0.016 0" rpy="0 0 0" axis="0 1 0"
+  />
+  <xacro:finger_joint 
+    name="index_upper_lower_joint" 
+    parent="ring_lower" 
+    child="ring_upper" 
+    xyz="0.06 0 0" rpy="0 0 0" axis="0 1 0"
+  />
+
+  <xacro:lower_link name="pinky_lower" color_macro="color_white"/>
+	<xacro:upper_link name="pinky_upper" color_macro="color_yellow"/>
+  <xacro:finger_joint 
+    name="index_base_lower_joint" 
+    parent="base_link" 
+    child="pinky_lower" 
+    xyz="0.095 -0.048 0" rpy="0 0 0" axis="0 1 0"
+  />
+  <xacro:finger_joint 
+    name="index_upper_lower_joint" 
+    parent="pinky_lower" 
+    child="pinky_upper" 
+    xyz="0.06 0 0" rpy="0 0 0" axis="0 1 0"
+  />
 
 </robot>
