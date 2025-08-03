@@ -58,7 +58,7 @@
 
 <!-- Macro for a finger joint -->
   <xacro:macro name="joint_limits" params="">
-    <limit lower="0" upper="1.57" effort="10" velocity="1"/>
+    <limit lower="-1.57" upper="1.57" effort="10" velocity="1"/>
   </xacro:macro>
 
   <xacro:macro name="finger_joint" params="name parent child xyz rpy axis">
