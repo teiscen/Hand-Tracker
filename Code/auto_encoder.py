@@ -43,7 +43,6 @@ with torch.no_grad():
 
 def main():
     print(torch.__version__)
-    print(torch.cuda.is_available())  # Should print True if GPU is working
-
+ 
 if __name__ == "__main__":
     main()
